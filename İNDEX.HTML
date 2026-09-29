@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 30px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #c0392b;
+        }
+
+        .description {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+        }
+
+        button {
+            display: block;
+            margin: 15px auto;
+            padding: 12px 25px;
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #922b21;
+        }
+
+        .recipe {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+            margin: 15px 0;
+            background: #fafafa;
+        }
+
+        .recipe h3 {
+            color: #c0392b;
+            margin-top: 0;
+        }
+
+        .ingredients {
+            color: #555;
+        }
+
+        .match {
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .missing {
+            color: #e67e22;
+        }
+
+        #results {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🍽️ Recipe Finder</h1>
+
+    <p class="description">
+        Enter the ingredients you have in your kitchen.
+        The website will suggest recipes from a database of 50 recipes.
+    </p>
+
+    <textarea id="ingredients"
+        placeholder="Example: chicken, tomato, onion, rice, garlic"></textarea>
+
+    <button onclick="findRecipes()">Find Recipes</button>
+
+    <div id="results"></div>
+
+</div>
+
+<script>
+
+const recipes = [
+
+    {
+        name: "Chicken Fried Rice",
+        ingredients: ["chicken", "rice", "egg", "carrot", "onion", "soy sauce"]
+    },
+
+    {
+        name: "Spaghetti Bolognese",
+        ingredients: ["spaghetti", "beef", "tomato", "onion", "garlic", "olive oil"]
+    },
+
+    {
+        name: "Chicken Pasta",
+        ingredients: ["chicken", "pasta", "cream", "garlic", "cheese"]
+    },
+
+    {
+        name: "Vegetable Stir Fry",
+        ingredients: ["carrot", "broccoli", "pepper", "onion", "soy sauce", "garlic"]
+    },
+
+    {
+        name: "Beef Burger",
+        ingredients: ["beef", "bread", "lettuce", "tomato", "onion", "cheese"]
+    },
+
+    {
+        name: "Margherita Pizza",
+        ingredients: ["flour", "tomato", "cheese", "olive oil", "basil"]
+    },
+
+    {
+        name: "Greek Salad",
+        ingredients: ["tomato", "cucumber", "onion", "feta cheese", "olive oil"]
+    },
+
+    {
+        name: "Chicken Soup",
+        ingredients: ["chicken", "carrot", "onion", "potato", "garlic"]
+    },
+
+    {
+        name: "Tuna Sandwich",
+        ingredients: ["tuna", "bread", "lettuce", "tomato", "mayonnaise"]
+    },
+
+    {
+        name: "Pancakes",
+        ingredients: ["flour", "milk", "egg", "sugar", "butter"]
+    },
+
+    {
+        name: "Omelette",
+        ingredients: ["egg", "cheese", "onion", "pepper"]
+    },
+
+    {
+        name: "French Toast",
+        ingredients: ["bread", "egg", "milk", "sugar", "butter"]
+    },
+
+    {
+        name: "Chicken Curry",
+        ingredients: ["chicken", "onion", "garlic", "tomato", "curry powder", "rice"]
+    },
+
+    {
+        name: "Beef Tacos",
+        ingredients: ["beef", "tortilla", "tomato", "lettuce", "cheese", "onion"]
+    },
+
+    {
+        name: "Guacamole",
+        ingredients: ["avocado", "tomato", "onion", "lime", "salt"]
+    },
+
+    {
+        name: "Tomato Soup",
+        ingredients: ["tomato", "onion", "garlic", "cream", "olive oil"]
+    },
+
+    {
+        name: "Potato Salad",
+        ingredients: ["potato", "mayonnaise", "onion", "egg", "mustard"]
+    },
+
+    {
+        name: "Caesar Salad",
+        ingredients: ["lettuce", "chicken", "cheese", "bread", "mayonnaise"]
+    },
+
+    {
+        name: "Lasagna",
+        ingredients: ["pasta", "beef", "tomato", "cheese", "onion"]
+    },
+
+    {
+        name: "Mac and Cheese",
+        ingredients: ["pasta", "cheese", "milk", "butter", "flour"]
+    },
+
+    {
+        name: "Chicken Wrap",
+        ingredients: ["chicken", "tortilla", "lettuce", "tomato", "cheese"]
+    },
+
+    {
+        name: "Fish and Chips",
+        ingredients: ["fish", "potato", "flour", "egg", "oil"]
+    },
+
+    {
+        name: "Beef Steak",
+        ingredients: ["beef", "butter", "garlic", "potato", "pepper"]
+    },
+
+    {
+        name: "Garlic Bread",
+        ingredients: ["bread", "garlic", "butter", "parsley"]
+    },
+
+    {
+        name: "Mushroom Pasta",
+        ingredients: ["pasta", "mushroom", "cream", "garlic", "cheese"]
+    },
+
+    {
+        name: "Chicken Noodles",
+        ingredients: ["chicken", "noodles", "carrot", "onion", "soy sauce"]
+    },
+
+    {
+        name: "Fried Eggs",
+        ingredients: ["egg", "butter", "salt", "pepper"]
+    },
+
+    {
+        name: "Rice and Beans",
+        ingredients: ["rice", "beans", "tomato", "onion", "garlic"]
+    },
+
+    {
+        name: "Chicken Burrito",
+        ingredients: ["chicken", "rice", "beans", "tortilla", "cheese"]
+    },
+
+    {
+        name: "Vegetable Soup",
+        ingredients: ["carrot", "potato", "onion", "tomato", "broccoli"]
+    },
+
+    {
+        name: "Beef Noodles",
+        ingredients: ["beef", "noodles", "onion", "carrot", "soy sauce"]
+    },
+
+    {
+        name: "Chicken Pizza",
+        ingredients: ["flour", "chicken", "tomato", "cheese", "olive oil"]
+    },
+
+    {
+        name: "Tuna Pasta",
+        ingredients: ["tuna", "pasta", "tomato", "onion", "olive oil"]
+    },
+
+    {
+        name: "Egg Fried Rice",
+        ingredients: ["rice", "egg", "carrot", "peas", "soy sauce"]
+    },
+
+    {
+        name: "Vegetable Omelette",
+        ingredients: ["egg", "tomato", "onion", "pepper", "cheese"]
+    },
+
+    {
+        name: "Chicken Salad",
+        ingredients: ["chicken", "lettuce", "tomato", "cucumber", "olive oil"]
+    },
+
+    {
+        name: "Tomato Pasta",
+        ingredients: ["pasta", "tomato", "garlic", "olive oil", "cheese"]
+    },
+
+    {
+        name: "Beef Pasta",
+        ingredients: ["beef", "pasta", "tomato", "onion", "cheese"]
+    },
+
+    {
+        name: "Chicken Sandwich",
+        ingredients: ["chicken", "bread", "lettuce", "tomato", "mayonnaise"]
+    },
+
+    {
+        name: "Vegetable Pizza",
+        ingredients: ["flour", "tomato", "cheese", "pepper", "mushroom"]
+    },
+
+    {
+        name: "Mushroom Soup",
+        ingredients: ["mushroom", "cream", "onion", "garlic", "butter"]
+    },
+
+    {
+        name: "Chicken Tacos",
+        ingredients: ["chicken", "tortilla", "lettuce", "tomato", "cheese"]
+    },
+
+    {
+        name: "Beef Sandwich",
+        ingredients: ["beef", "bread", "lettuce", "onion", "cheese"]
+    },
+
+    {
+        name: "Creamy Chicken",
+        ingredients: ["chicken", "cream", "garlic", "butter", "cheese"]
+    },
+
+    {
+        name: "Vegetable Rice",
+        ingredients: ["rice", "carrot", "peas", "corn", "onion"]
+    },
+
+    {
+        name: "Chicken and Potatoes",
+        ingredients: ["chicken", "potato", "onion", "garlic", "olive oil"]
+    },
+
+    {
+        name: "Beef and Rice",
+        ingredients: ["beef", "rice", "onion", "pepper", "soy sauce"]
+    },
+
+    {
+        name: "Cheese Quesadilla",
+        ingredients: ["tortilla", "cheese", "onion", "pepper"]
+    },
+
+    {
+        name: "Egg Sandwich",
+        ingredients: ["egg", "bread", "cheese", "lettuce"]
+    },
+
+    {
+        name: "Chicken Dumplings",
+        ingredients: ["chicken", "flour", "onion", "garlic", "soy sauce"]
+    }
+
+];
+
+
+function findRecipes() {
+
+    const input = document
+        .getElementById("ingredients")
+        .value
+        .toLowerCase();
+
+    const userIngredients = input
+        .split(",")
+        .map(item => item.trim())
+        .filter(item => item !== "");
+
+    const results = document.getElementById("results");
+
+    if (userIngredients.length === 0) {
+        results.innerHTML =
+            "<p>Please enter at least one ingredient.</p>";
+        return;
+    }
+
+    let matches = [];
+
+    recipes.forEach(recipe => {
+
+        const matchedIngredients = recipe.ingredients.filter(
+            ingredient => userIngredients.includes(ingredient)
+        );
+
+        const missingIngredients = recipe.ingredients.filter(
+            ingredient => !userIngredients.includes(ingredient)
+        );
+
+        const percentage =
+            Math.round(
+                (matchedIngredients.length /
+                recipe.ingredients.length) * 100
+            );
+
+        if (matchedIngredients.length > 0) {
+
+            matches.push({
+                recipe: recipe,
+                matched: matchedIngredients,
+                missing: missingIngredients,
+                percentage: percentage
+            });
+
+        }
+
+    });
+
+
+    matches.sort((a, b) => b.percentage - a.percentage);
+
+
+    if (matches.length === 0) {
+
+        results.innerHTML =
+            "<h2>No recipes found.</h2>" +
+            "<p>Try adding different ingredients.</p>";
+
+        return;
+    }
+
+
+    let html = "<h2>Suggested Recipes</h2>";
+
+
+    matches.forEach(item => {
+
+        html += `
+            <div class="recipe">
+
+                <h3>${item.recipe.name}</h3>
+
+                <p>
+                    <span class="match">
+                        ${item.percentage}% ingredients available
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Ingredients:</strong>
+                    ${item.recipe.ingredients.join(", ")}
+                </p>
+
+                <p class="match">
+                    You have:
+                    ${item.matched.join(", ")}
+                </p>
+
+                <p class="missing">
+                    Missing:
+                    ${
+                        item.missing.length > 0
+                        ? item.missing.join(", ")
+                        : "None - You have all ingredients!"
+                    }
+                </p>
+
+            </div>
+        `;
+
+    });
+
+
+    results.innerHTML = html;
+
+}
+
+</script>
+
+</body>
+</html>
